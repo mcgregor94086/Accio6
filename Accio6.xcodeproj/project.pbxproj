@@ -6,8 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		11810EE92D1D1F1F00FCE1D0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111955182D1C79D600055137 /* XCTest.framework */; platformFilter = ios; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
-		11885DB42D04018E007EA382 /* PBXContainerItemProxy */ = {
+		11810ED32D1CBA7500FCE1D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 11885D972D04018B007EA382 /* Project object */;
 			proxyType = 1;
@@ -24,13 +28,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		111955182D1C79D600055137 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		11810ECF2D1CBA7500FCE1D0 /* Accio6Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Accio6Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		11810EEA2D1D241200FCE1D0 /* Accio6.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Accio6.xctestplan; sourceTree = "<group>"; };
 		11885D9F2D04018B007EA382 /* Accio6.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Accio6.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		11885DB32D04018E007EA382 /* Accio6Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Accio6Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		11885DBD2D04018E007EA382 /* Accio6UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Accio6UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		11885DC52D04018E007EA382 /* Exceptions for "Accio6" folder in "Accio6" target */ = {
+		11AE9F792D17D9150096E905 /* Exceptions for "Accio6" folder in "Accio6" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -40,17 +46,17 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		11810ED02D1CBA7500FCE1D0 /* Accio6Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Accio6Tests;
+			sourceTree = "<group>";
+		};
 		11885DA12D04018B007EA382 /* Accio6 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				11885DC52D04018E007EA382 /* Exceptions for "Accio6" folder in "Accio6" target */,
+				11AE9F792D17D9150096E905 /* Exceptions for "Accio6" folder in "Accio6" target */,
 			);
 			path = Accio6;
-			sourceTree = "<group>";
-		};
-		11885DB62D04018E007EA382 /* Accio6Tests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Accio6Tests;
 			sourceTree = "<group>";
 		};
 		11885DC02D04018E007EA382 /* Accio6UITests */ = {
@@ -61,14 +67,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		11885D9C2D04018B007EA382 /* Frameworks */ = {
+		11810ECC2D1CBA7500FCE1D0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11810EE92D1D1F1F00FCE1D0 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		11885DB02D04018E007EA382 /* Frameworks */ = {
+		11885D9C2D04018B007EA382 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -85,12 +92,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		111955172D1C799300055137 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				111955182D1C79D600055137 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		11885D962D04018B007EA382 = {
 			isa = PBXGroup;
 			children = (
+				11810EEA2D1D241200FCE1D0 /* Accio6.xctestplan */,
 				11885DA12D04018B007EA382 /* Accio6 */,
-				11885DB62D04018E007EA382 /* Accio6Tests */,
 				11885DC02D04018E007EA382 /* Accio6UITests */,
+				11810ED02D1CBA7500FCE1D0 /* Accio6Tests */,
+				111955172D1C799300055137 /* Frameworks */,
 				11885DA02D04018B007EA382 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,8 +116,8 @@
 			isa = PBXGroup;
 			children = (
 				11885D9F2D04018B007EA382 /* Accio6.app */,
-				11885DB32D04018E007EA382 /* Accio6Tests.xctest */,
 				11885DBD2D04018E007EA382 /* Accio6UITests.xctest */,
+				11810ECF2D1CBA7500FCE1D0 /* Accio6Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,6 +125,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		11810ECE2D1CBA7500FCE1D0 /* Accio6Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11810ED52D1CBA7500FCE1D0 /* Build configuration list for PBXNativeTarget "Accio6Tests" */;
+			buildPhases = (
+				11810ECB2D1CBA7500FCE1D0 /* Sources */,
+				11810ECC2D1CBA7500FCE1D0 /* Frameworks */,
+				11810ECD2D1CBA7500FCE1D0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				11810ED42D1CBA7500FCE1D0 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				11810ED02D1CBA7500FCE1D0 /* Accio6Tests */,
+			);
+			name = Accio6Tests;
+			packageProductDependencies = (
+			);
+			productName = Accio6Tests;
+			productReference = 11810ECF2D1CBA7500FCE1D0 /* Accio6Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		11885D9E2D04018B007EA382 /* Accio6 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 11885DC62D04018E007EA382 /* Build configuration list for PBXNativeTarget "Accio6" */;
@@ -129,29 +169,6 @@
 			productName = Accio6;
 			productReference = 11885D9F2D04018B007EA382 /* Accio6.app */;
 			productType = "com.apple.product-type.application";
-		};
-		11885DB22D04018E007EA382 /* Accio6Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 11885DCB2D04018E007EA382 /* Build configuration list for PBXNativeTarget "Accio6Tests" */;
-			buildPhases = (
-				11885DAF2D04018E007EA382 /* Sources */,
-				11885DB02D04018E007EA382 /* Frameworks */,
-				11885DB12D04018E007EA382 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				11885DB52D04018E007EA382 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				11885DB62D04018E007EA382 /* Accio6Tests */,
-			);
-			name = Accio6Tests;
-			packageProductDependencies = (
-			);
-			productName = Accio6Tests;
-			productReference = 11885DB32D04018E007EA382 /* Accio6Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		11885DBC2D04018E007EA382 /* Accio6UITests */ = {
 			isa = PBXNativeTarget;
@@ -183,15 +200,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1610;
-				LastUpgradeCheck = 1610;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					11810ECE2D1CBA7500FCE1D0 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 11885D9E2D04018B007EA382;
+					};
 					11885D9E2D04018B007EA382 = {
 						CreatedOnToolsVersion = 16.1;
-					};
-					11885DB22D04018E007EA382 = {
-						CreatedOnToolsVersion = 16.1;
-						TestTargetID = 11885D9E2D04018B007EA382;
 					};
 					11885DBC2D04018E007EA382 = {
 						CreatedOnToolsVersion = 16.1;
@@ -214,21 +231,21 @@
 			projectRoot = "";
 			targets = (
 				11885D9E2D04018B007EA382 /* Accio6 */,
-				11885DB22D04018E007EA382 /* Accio6Tests */,
 				11885DBC2D04018E007EA382 /* Accio6UITests */,
+				11810ECE2D1CBA7500FCE1D0 /* Accio6Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		11885D9D2D04018B007EA382 /* Resources */ = {
+		11810ECD2D1CBA7500FCE1D0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		11885DB12D04018E007EA382 /* Resources */ = {
+		11885D9D2D04018B007EA382 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -245,14 +262,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		11885D9B2D04018B007EA382 /* Sources */ = {
+		11810ECB2D1CBA7500FCE1D0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		11885DAF2D04018E007EA382 /* Sources */ = {
+		11885D9B2D04018B007EA382 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -269,10 +286,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		11885DB52D04018E007EA382 /* PBXTargetDependency */ = {
+		11810ED42D1CBA7500FCE1D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 11885D9E2D04018B007EA382 /* Accio6 */;
-			targetProxy = 11885DB42D04018E007EA382 /* PBXContainerItemProxy */;
+			targetProxy = 11810ED32D1CBA7500FCE1D0 /* PBXContainerItemProxy */;
 		};
 		11885DBF2D04018E007EA382 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -282,6 +299,44 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		11810ED62D1CBA7500FCE1D0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 53ZV39K4J7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SwiftDevelopmentGroup.Accio6Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Accio6.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Accio6";
+			};
+			name = Debug;
+		};
+		11810ED72D1CBA7500FCE1D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 53ZV39K4J7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SwiftDevelopmentGroup.Accio6Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Accio6.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Accio6";
+			};
+			name = Release;
+		};
 		11885DC72D04018E007EA382 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -295,6 +350,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Accio6/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Accio6;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -326,6 +382,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Accio6/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Accio6;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -463,44 +520,6 @@
 			};
 			name = Release;
 		};
-		11885DCC2D04018E007EA382 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 53ZV39K4J7;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.SwiftDevelopmentGroup.Accio6Tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Accio6.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Accio6";
-			};
-			name = Debug;
-		};
-		11885DCD2D04018E007EA382 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 53ZV39K4J7;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.SwiftDevelopmentGroup.Accio6Tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Accio6.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Accio6";
-			};
-			name = Release;
-		};
 		11885DCF2D04018E007EA382 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -538,6 +557,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		11810ED52D1CBA7500FCE1D0 /* Build configuration list for PBXNativeTarget "Accio6Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11810ED62D1CBA7500FCE1D0 /* Debug */,
+				11810ED72D1CBA7500FCE1D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		11885D9A2D04018B007EA382 /* Build configuration list for PBXProject "Accio6" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -552,15 +580,6 @@
 			buildConfigurations = (
 				11885DC72D04018E007EA382 /* Debug */,
 				11885DC82D04018E007EA382 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		11885DCB2D04018E007EA382 /* Build configuration list for PBXNativeTarget "Accio6Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				11885DCC2D04018E007EA382 /* Debug */,
-				11885DCD2D04018E007EA382 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

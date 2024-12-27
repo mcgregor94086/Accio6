@@ -2,11 +2,10 @@
 //  Accio6Tests.swift
 //  Accio6Tests
 //
-//  Created by Scott McGregor on 12/6/24.
+//  Created by Scott McGregor on 12/25/24.
 //
 
 import Testing
-@testable import Accio6
 
 struct Accio6Tests {
 

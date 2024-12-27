@@ -1,32 +1,25 @@
-//
-//  Accio6App.swift
-//  Accio6
-//
-//  Created by Scott McGregor on 12/6/24.
-//
-
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct Accio6App: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    let modelContainer: ModelContainer
 
+    init() {
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            modelContainer = try ModelContainer(
+                for: InventoryItem.self,
+                configurations: ModelConfiguration(isStoredInMemoryOnly: false)
+            )
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("Could not initialize ModelContainer: \(error)")
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .modelContainer(modelContainer)
         }
-        .modelContainer(sharedModelContainer)
     }
 }
