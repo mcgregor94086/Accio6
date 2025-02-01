@@ -1,50 +1,58 @@
-//
-//  ParentEditorView.swift
-//  Accio6
-//
-//  Created by [Your Name] on [Date].
-//
-
 import SwiftUI
+import SwiftData
 
 struct ParentEditorView: View {
-    @Binding var item: InventoryItem
-    let allItems: [InventoryItem]
-
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-
-    var availableParents: [InventoryItem] {
-        allItems.filter { $0.id != item.id && !createsCycle(for: $0) }
-    }
-
+    @Binding var path: [UUID]
+    let item: InventoryItem
+    
     var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("Select New Parent")) {
-                    ForEach(availableParents, id: \.id) { parent in
-                        Button(parent.itemName) {
-                            item.parentID = parent.id
-                            dismiss()
-                        }
+        List {
+            Section {
+                if let parentID = item.parentID,
+                   let parent = try? modelContext.fetch(
+                    FetchDescriptor<InventoryItem>(
+                        predicate: PredicateBuilder.parentPredicate(childID: parentID)
+                    )
+                   ).first {
+                    NavigationLink(value: parent.id) {
+                        ItemRow(item: parent)
                     }
+                } else {
+                    Text("No Parent")
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Current Parent")
+            }
+            
+            Section {
+                Button("Move to Root") {
+                    item.parentID = nil
+                    try? modelContext.save()
+                    if let id = item.id {
+                        path = [id]
+                    }
+                    dismiss()
                 }
             }
-            .navigationTitle("Edit Parent")
         }
+        .navigationTitle("Select Parent")
+        .navigationBarTitleDisplayMode(.inline)
     }
+}
 
-    private func createsCycle(for parent: InventoryItem) -> Bool {
-        var visited = Set<UUID>()
-        var stack: [UUID] = [parent.id]
-
-        while let current = stack.popLast() {
-            if visited.contains(current) {
-                return true
-            }
-            visited.insert(current)
-            let children = allItems.filter { $0.parentID == current }
-            stack.append(contentsOf: children.map { $0.id })
-        }
-        return false
+#Preview {
+    NavigationStack {
+        ParentEditorView(
+            path: .constant([]),
+            item: InventoryItem(
+                itemName: "Test Item",
+                itemType: .item,
+                tags: ["test"]
+            )
+        )
     }
+    .modelContainer(for: InventoryItem.self, inMemory: true)
 }

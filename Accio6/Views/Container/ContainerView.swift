@@ -5,20 +5,20 @@
 //  Created by Scott McGregor on 12/22/24.
 //
 
-
-import SwiftUI
 import SwiftData
+import SwiftUI
 
+/// Main view for displaying and managing container contents
 struct ContainerView: View {
     @Environment(\.modelContext) private var modelContext
     let container: InventoryItem
     @Query private var children: [InventoryItem]
+    @State private var showingAddSheet = false
     
     init(container: InventoryItem) {
         self.container = container
-        let predicate = PredicateHelper.basicParentPredicate(parentId: container.id)
-        let sortDescriptor = SortDescriptor<InventoryItem>(\.itemName)
-        _children = Query(filter: predicate, sort: [sortDescriptor])
+        let predicate = PredicateHelper.childrenPredicate(parentId: container.id)
+        _children = Query(filter: predicate, sort: [SortDescriptor(\InventoryItem.itemName)])
     }
     
     var body: some View {
@@ -37,15 +37,15 @@ struct ContainerView: View {
             
             Section {
                 if children.isEmpty {
-                    ContentUnavailableView(
-                        "Empty Container",
-                        systemImage: "square.dashed",
-                        description: Text("Add items using the + button")
-                    )
+                    ContentUnavailableView {
+                        Label("Empty Container", systemImage: "square.dashed")
+                    } description: {
+                        Text("Add items using the + button")
+                    }
                 } else {
                     ForEach(children) { item in
                         NavigationLink {
-                            if item.itemType == .container {
+                            if item.isContainer {
                                 ContainerView(container: item)
                             } else {
                                 ItemDetailView(item: item)
@@ -63,64 +63,59 @@ struct ContainerView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    addItem()
+                    showingAddSheet = true
                 } label: {
                     Label("Add Item", systemImage: "plus")
                 }
             }
         }
-        .sheet(item: $selectedItem) { item in
+        .sheet(isPresented: $showingAddSheet) {
             NavigationStack {
-                ItemEditView(item: item)
+                NewItemEditorView(parentContainer: container)
             }
-        }
-    }
-    
-    @State private var selectedItem: InventoryItem?
-    
-    private func addItem() {
-        let sheet = NewItemEditorView(parentContainer: container)
-        let host = UIHostingController(rootView: NavigationStack { sheet })
-        host.isModalInPresentation = true
-        host.modalPresentationStyle = .formSheet
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first,
-           let rootVC = window.rootViewController {
-            rootVC.present(host, animated: true)
         }
     }
     
     private func deleteItems(at offsets: IndexSet) {
         for index in offsets {
             let item = children[index]
-            if item.itemType == .container {
-                // Recursively delete children
-                let childItems = item.children
-                for child in childItems {
-                    modelContext.delete(child)
-                }
+            if item.isContainer {
+                deleteChildren(of: item)
             }
             modelContext.delete(item)
         }
     }
+    
+    private func deleteChildren(of item: InventoryItem) {
+        guard let childItems = try? modelContext.fetch(FetchDescriptor<InventoryItem>(
+            predicate: PredicateHelper.childrenPredicate(parentId: item.id)
+        )) else { return }
+        
+        childItems.forEach { child in
+            if child.isContainer {
+                deleteChildren(of: child)
+            }
+            modelContext.delete(child)
+        }
+    }
 }
-
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: InventoryItem.self, configurations: config)
-    
+
     let context = container.mainContext
     let testContainer = InventoryItem(itemName: "Test Container", itemType: .container)
     context.insert(testContainer)
-    
+
     let item1 = InventoryItem(itemName: "Item 1", parentID: testContainer.id)
     let item2 = InventoryItem(itemName: "Item 2", parentID: testContainer.id)
     context.insert(item1)
     context.insert(item2)
-    
+
     return NavigationStack {
         ContainerView(container: testContainer)
     }
     .modelContainer(container)
 }
+
+

@@ -1,57 +1,109 @@
-//
-//  InventoryAccordionView.swift
-//  Accio6
-//
-//  Created by [Your Name] on [Date].
-//
-
 import SwiftUI
+import SwiftData
 
 struct InventoryAccordionView: View {
-    @Binding var expandedItems: Set<UUID> // Tracks expanded items
-    let item: InventoryItem
-    let allItems: [InventoryItem]
-
-    var childItems: [InventoryItem] {
-        allItems.filter { $0.parentID == item.id }
+    @Environment(\.modelContext) private var modelContext
+    @Query private var containers: [InventoryItem]
+    @Query private var items: [InventoryItem]
+    
+    let container: InventoryItem
+    @State private var isExpanded = true
+    
+    init(container: InventoryItem) {
+        let containerId = container.id  // Capture the values we need
+        let containerType = ItemType.container
+        let itemType = ItemType.item
+        
+        self.container = container
+        
+        let containerPredicate = #Predicate<InventoryItem> { item in
+            item.parentID == containerId && item.itemType == containerType
+        }
+        self._containers = Query(filter: containerPredicate, sort: \InventoryItem.itemName)
+        
+        let itemsPredicate = #Predicate<InventoryItem> { item in
+            item.parentID == containerId && item.itemType == itemType
+        }
+        self._items = Query(filter: itemsPredicate, sort: \InventoryItem.itemName)
     }
-
+    
     var body: some View {
-        VStack(alignment: .leading) {
+        DisclosureGroup(isExpanded: $isExpanded) {
+            ForEach(containers) { container in
+                InventoryAccordionView(container: container)
+            }
+            
+            ForEach(items) { item in
+                NavigationLink(value: item) {
+                    InventoryItemRow(item: item)
+                }
+            }
+            .onDelete(perform: deleteItems)
+        } label: {
             HStack {
-                if item.itemType == .container && !childItems.isEmpty {
-                    Button(action: toggleExpansion) {
-                        Image(systemName: expandedItems.contains(item.id) ? "chevron.down" : "chevron.right")
-                            .frame(width: 20) // Keeps alignment consistent
+                Label(container.itemName, systemImage: "folder")
+                Spacer()
+                Menu {
+                    Button {
+                        addContainer()
+                    } label: {
+                        Label("Add Container", systemImage: "folder.badge.plus")
                     }
-                } else {
-                    Spacer().frame(width: 20) // Empty space for non-containers
-                }
-                Image(systemName: item.itemType == .container ? "folder" : "doc.text")
-                Text(item.itemName)
-                    .fontWeight(.bold)
-            }
-            .padding(.vertical, 4)
-
-            // Show children if expanded
-            if expandedItems.contains(item.id) {
-                ForEach(childItems) { child in
-                    InventoryAccordionView(
-                        expandedItems: $expandedItems,
-                        item: child,
-                        allItems: allItems
-                    )
-                    .padding(.leading, 20) // Indentation for children
+                    
+                    Button {
+                        addItem()
+                    } label: {
+                        Label("Add Item", systemImage: "doc.badge.plus")
+                    }
+                } label: {
+                    Image(systemName: "plus.circle.fill")
                 }
             }
         }
     }
-
-    private func toggleExpansion() {
-        if expandedItems.contains(item.id) {
-            expandedItems.remove(item.id)
-        } else {
-            expandedItems.insert(item.id)
+    
+    private func addContainer() {
+        let newContainer = InventoryItem(
+            itemName: "New Container",
+            itemType: .container,
+            tags: [],
+            parentID: container.id
+        )
+        modelContext.insert(newContainer)
+    }
+    
+    private func addItem() {
+        let newItem = InventoryItem(
+            itemName: "New Item",
+            itemType: .item,
+            tags: [],
+            parentID: container.id
+        )
+        modelContext.insert(newItem)
+    }
+    
+    private func deleteItems(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(items[index])
         }
     }
+}
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: InventoryItem.self, configurations: config)
+    
+    let rootContainer = InventoryItem(
+        itemName: "Root",
+        itemType: .container,
+        tags: ["preview"]
+    )
+    container.mainContext.insert(rootContainer)
+    
+    return NavigationStack {
+        List {
+            InventoryAccordionView(container: rootContainer)
+        }
+    }
+    .modelContainer(container)
 }

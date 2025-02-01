@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 
+/// View for editing the type of an inventory item
 struct EditTypeView: View {
     @Binding var item: InventoryItem
     @Environment(\.dismiss) private var dismiss
@@ -29,4 +30,14 @@ struct EditTypeView: View {
             }
         }
     }
+}
+
+// MARK: - Preview Provider
+#Preview("Edit Type") {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: InventoryItem.self, configurations: config)
+    let item = InventoryItem(itemName: "Test Item", itemType: .item)
+    
+    return EditTypeView(item: .constant(item))
+        .modelContainer(container)
 }

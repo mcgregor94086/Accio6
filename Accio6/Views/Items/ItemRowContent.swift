@@ -1,68 +1,111 @@
 import SwiftUI
 import SwiftData
-import AVFoundation // For playing sounds
 
 struct ItemRowContent: View {
+    @Environment(\.modelContext) private var modelContext
     let item: InventoryItem
-    let allItems: [InventoryItem]
-    @Binding var expandedItems: Set<UUID>
-    @Binding var showingAlert: Bool
-    @Binding var selectedItem: InventoryItem?
-    var onDelete: (InventoryItem) -> Void
-
-    var childCount: Int {
-        allItems.filter { $0.parentID == item.id }.count
-    }
-
+    @State private var showingDebugInfo = false
+    @State private var showingDeleteConfirmation = false
+    @State private var showingError = false
+    @State private var errorMessage: String?
+    
     var body: some View {
         HStack {
-            Image(systemName: item.itemType == .container ? "folder.fill" : "doc.fill")
-                .foregroundStyle(item.itemType == .container ? .blue : .secondary)
+            Image(systemName: item.itemType == .container ? "folder" : "doc")
+                .foregroundStyle(item.itemType == .container ? .blue : .primary)
             
-  
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading) {
                 Text(item.itemName)
-                    .font(.body)
-                if childCount > 0 {
-                    Text("\(childCount) items")
+                
+                if !item.tags.isEmpty {
+                    Text(item.tags.joined(separator: ", "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
             
-            Spacer()
-            
-            // Use contextMenu instead of separate buttons
-            Menu {
-                if item.itemName != "My Stuff" {
-                    Button(role: .destructive) {
-                        onDelete(item)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-                Button {
-                    selectedItem = item
-                } label: {
-                    Label("Edit", systemImage: "pencil")
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
+            if item.itemType == .container {
+                Spacer()
+                Image(systemName: "chevron.forward")
                     .foregroundStyle(.secondary)
+                    .font(.caption)
             }
         }
         .contentShape(Rectangle())
-    }
-
-    private func toggleExpansion() {
-        if expandedItems.contains(item.id) {
-            expandedItems.remove(item.id)
-        } else {
-            expandedItems.insert(item.id)
+        .contextMenu {
+            if item.itemType == .container {
+                NavigationLink(value: item) {
+                    Label("Open", systemImage: "folder")
+                }
+            }
+            
+            Button {
+                showingDebugInfo = true
+            } label: {
+                Label("Show Debug Info", systemImage: "info.circle")
+            }
+            
+            Button(role: .destructive) {
+                showingDeleteConfirmation = true
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+        .sheet(isPresented: $showingDebugInfo) {
+            NavigationStack {
+                InventoryItemDebugView(item: item)
+            }
+        }
+        .alert("Delete Item", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                deleteItem()
+            }
+        } message: {
+            Text("Are you sure you want to delete this item? This cannot be undone.")
+        }
+        .alert("Error", isPresented: $showingError, presenting: errorMessage) { _ in
+            Button("OK") { }
+        } message: { message in
+            Text(message)
         }
     }
-
-    private func playErrorSound() {
-        AudioServicesPlaySystemSound(SystemSoundID(1053)) // Play error sound
+    
+    private func deleteItem() {
+        do {
+            if let itemID = item.id {
+                let childrenDescriptor = FetchDescriptor<InventoryItem>(
+                    predicate: PredicateBuilder.childrenPredicate(parentID: itemID)
+                )
+                if let children = try? modelContext.fetch(childrenDescriptor) {
+                    for child in children {
+                        modelContext.delete(child)
+                    }
+                }
+            }
+            
+            modelContext.delete(item)
+            try modelContext.save()
+        } catch {
+            errorMessage = "Failed to delete item: \(error.localizedDescription)"
+            showingError = true
+        }
     }
+}
+
+#Preview {
+    List {
+        ItemRowContent(item: InventoryItem(
+            itemName: "Test Item",
+            itemType: .item,
+            tags: ["test", "preview"]
+        ))
+        
+        ItemRowContent(item: InventoryItem(
+            itemName: "Test Container",
+            itemType: .container,
+            tags: ["test", "container"]
+        ))
+    }
+    .modelContainer(for: InventoryItem.self, inMemory: true)
 }

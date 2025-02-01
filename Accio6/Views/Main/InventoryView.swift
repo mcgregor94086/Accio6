@@ -7,9 +7,11 @@ struct InventoryView: View {
     @State private var errorMessage: String?
     @State private var showingError = false
     @State private var expandedItems: Set<UUID> = []
+    @State private var selectedParent: UUID?
     
-    init(currentContainer: InventoryItem?) {
-        let predicate = PredicateHelper.childrenPredicate(parentId: currentContainer?.id)
+    init(parentID: UUID?) {
+        print("InventoryView init with parentID: \(String(describing: parentID))")
+        let predicate = PredicateBuilder.childrenPredicate(parentID: parentID)
         let sortDescriptor = SortDescriptor<InventoryItem>(\.itemName)
         _rootItems = Query(filter: predicate, sort: [sortDescriptor])
     }
@@ -30,20 +32,26 @@ struct InventoryView: View {
                             }
                         )
                     ) {
-                        InventoryView(currentContainer: item)
-                            .padding(.leading, -20) // Remove default List indentation
+                        InventoryView(parentID: item.id)
+                            .padding(.leading, -20)
                     } label: {
                         ItemRow(item: item)
-                            .padding(.leading, -20) // Remove default List indentation
+                            .padding(.leading, -20)
                     }
                 } else {
                     ItemRow(item: item)
-                        .padding(.leading, -20) // Remove default List indentation
+                        .padding(.leading, -20)
                 }
             }
             .onDelete(perform: deleteItems)
         }
-        .listStyle(.plain) // Use plain style to remove default List styling
+        .listStyle(.plain)
+        .onAppear {
+            print("InventoryView appeared with \(rootItems.count) items:")
+            for item in rootItems {
+                print("- \(item.itemName) (Type: \(item.itemType), ParentID: \(String(describing: item.parentID)))")
+            }
+        }
         .alert("Error", isPresented: $showingError, presenting: errorMessage) { _ in
             Button("OK") { }
         } message: { message in
@@ -67,7 +75,7 @@ struct InventoryView: View {
     
     private func deleteItemAndChildren(_ item: InventoryItem) throws {
         let descriptor = FetchDescriptor<InventoryItem>(
-            predicate: PredicateHelper.childrenPredicate(parentId: item.id)
+            predicate: PredicateBuilder.childrenPredicate(parentID: item.id)
         )
         
         if let children = try? modelContext.fetch(descriptor) {
@@ -89,7 +97,7 @@ struct ContainerDetailView: View {
     @State private var showingError = false
     
     var body: some View {
-        InventoryView(currentContainer: container)
+        InventoryView(parentID: container.id)
             .navigationTitle(container.itemName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -102,7 +110,7 @@ struct ContainerDetailView: View {
                 }
             }
             .sheet(isPresented: $showingAddItem) {
-                AddItemView(parentContainer: container)
+                NewItemEditorView(parentID: container.id)
             }
             .sheet(item: $showingItemDetail) { item in
                 ItemDetailView(item: item)
@@ -124,7 +132,7 @@ struct ContainerDetailView: View {
 
 #Preview {
     NavigationStack {
-        InventoryView(currentContainer: nil)
+        InventoryView(parentID: nil)
     }
     .modelContainer(for: InventoryItem.self, inMemory: true)
 }

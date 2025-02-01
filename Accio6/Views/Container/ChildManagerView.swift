@@ -1,73 +1,72 @@
-//
-//  ChildManagerView.swift
-//  Accio6
-//
-//  Created by [Your Name] on [Date].
-//
-
 import SwiftUI
 import SwiftData
 
 struct ChildManagerView: View {
-    @Binding var item: InventoryItem
-    let allItems: [InventoryItem]
-
-    @Environment(\.modelContext) private var context
-    @Environment(\.dismiss) private var dismiss
-
+    @Environment(\.modelContext) private var modelContext
+    @Query private var items: [InventoryItem]
+    
+    let parentID: UUID
+    
+    init(parentID: UUID) {
+        self.parentID = parentID
+        self._items = Query(
+            filter: #Predicate<InventoryItem> { item in
+                item.parentID == parentID
+            },
+            sort: \InventoryItem.itemName
+        )
+    }
+    
     var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("Manage Child Items")) {
-                    ForEach(allItems.filter { $0.parentID == item.id }, id: \.id) { child in
-                        HStack {
-                            Text(child.itemName)
-                                .foregroundColor(.blue)
-                            Spacer()
-                            Menu {
-                                Button("Reparent to Root") {
-                                    child.parentID = nil
-                                    saveChanges()
-                                }
-                                Button("Delete", role: .destructive) {
-                                    deleteChild(child)
-                                }
-                            } label: {
-                                Image(systemName: "ellipsis")
-                            }
+        List {
+            ForEach(items) { item in
+                NavigationLink(value: item) {
+                    VStack(alignment: .leading) {
+                        Text(item.itemName)
+                        if !item.tags.isEmpty {
+                            Text(item.tags.joined(separator: ", "))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                    }
-                    Button("Add New Child") {
-                        createNewChild()
                     }
                 }
             }
-            .navigationTitle("Child Manager")
+            .onDelete(perform: deleteItems)
+        }
+        .navigationDestination(for: InventoryItem.self) { item in
+            ItemDetailView(item: item)
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: addItem) {
+                    Label("Add Item", systemImage: "plus")
+                }
+            }
         }
     }
-
-    // MARK: - Actions
-
-    private func deleteChild(_ child: InventoryItem) {
-        context.delete(child)
-        saveChanges()
-    }
-
-    private func createNewChild() {
-        let newChild = InventoryItem(
-            itemName: "New Child",
-            itemType: .item, // Correct order: itemType comes before parentID
-            parentID: item.id
+    
+    private func addItem() {
+        let newItem = InventoryItem(
+            itemName: "New Item",
+            itemType: .item,
+            parentID: parentID
         )
-        context.insert(newChild)
-        saveChanges()
+        modelContext.insert(newItem)
     }
-
-    private func saveChanges() {
-        do {
-            try context.save()
-        } catch {
-            print("Failed to save changes: \(error)")
+    
+    private func deleteItems(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(items[index])
         }
     }
+}
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: InventoryItem.self, configurations: config)
+    
+    return NavigationStack {
+        ChildManagerView(parentID: UUID())
+    }
+    .modelContainer(container)
 }

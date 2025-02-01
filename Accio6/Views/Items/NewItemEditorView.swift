@@ -2,45 +2,24 @@ import SwiftUI
 import SwiftData
 
 struct NewItemEditorView: View {
-    @Environment(\.dismiss) private var dismiss
+    let parentID: UUID?
     @Environment(\.modelContext) private var modelContext
-    @Query private var allItems: [InventoryItem]
-    
+    @Environment(\.dismiss) private var dismiss
     @State private var itemName = ""
-    @State private var itemType: InventoryItemType = .item
-    @State private var selectedParentID: UUID?
-    @State private var errorMessage: String?
-    @State private var showingError = false
-    
-    let parentContainer: InventoryItem?
-    
-    init(parentContainer: InventoryItem? = nil) {
-        self.parentContainer = parentContainer
-        _selectedParentID = State(initialValue: parentContainer?.id)
-    }
-    
-    var availableContainers: [InventoryItem] {
-        allItems.filter { $0.itemType == .container }
-    }
+    @State private var itemType: ItemType = .item
+    @State private var tags = ""
     
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Item Name", text: $itemName)
-                
+                TextField("Name", text: $itemName)
                 Picker("Type", selection: $itemType) {
-                    Text("Item").tag(InventoryItemType.item)
-                    Text("Container").tag(InventoryItemType.container)
-                }
-                
-                if parentContainer == nil {
-                    Picker("Container", selection: $selectedParentID) {
-                        Text("No Container").tag(nil as UUID?)
-                        ForEach(availableContainers) { container in
-                            Text(container.itemName).tag(container.id as UUID?)
-                        }
+                    ForEach(ItemType.allCases, id: \.self) { type in
+                        Text(type.rawValue.capitalized)
+                            .tag(type)
                     }
                 }
+                TextField("Tags (comma separated)", text: $tags)
             }
             .navigationTitle("New Item")
             .navigationBarTitleDisplayMode(.inline)
@@ -57,32 +36,28 @@ struct NewItemEditorView: View {
                     .disabled(itemName.isEmpty)
                 }
             }
-            .alert("Error", isPresented: $showingError, presenting: errorMessage) { _ in
-                Button("OK") { }
-            } message: { message in
-                Text(message)
-            }
         }
     }
     
     private func addItem() {
-        do {
-            let newItem = InventoryItem(
-                itemName: itemName,
-                itemType: itemType,
-                parentID: parentContainer?.id ?? selectedParentID
-            )
-            modelContext.insert(newItem)
-            try modelContext.save()
-            dismiss()
-        } catch {
-            errorMessage = "Failed to save item: \(error.localizedDescription)"
-            showingError = true
-        }
+        let tagArray = tags.split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        
+        let newItem = InventoryItem(
+            itemName: itemName,
+            itemType: itemType,
+            tags: tagArray,
+            parentID: parentID
+        )
+        
+        modelContext.insert(newItem)
+        try? modelContext.save()
+        dismiss()
     }
 }
 
 #Preview {
-    NewItemEditorView()
+    NewItemEditorView(parentID: nil)
         .modelContainer(for: InventoryItem.self, inMemory: true)
 }

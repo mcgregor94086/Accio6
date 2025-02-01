@@ -1,12 +1,12 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
-// Define the environment key properly
+// Environment key definition stays the same
 private struct ItemCountKey: EnvironmentKey {
     static let defaultValue: Int = 0
 }
 
-// Define the environment value properly
+// Environment value extension stays the same
 extension EnvironmentValues {
     var itemCount: Int {
         get { self[ItemCountKey.self] }
@@ -16,19 +16,21 @@ extension EnvironmentValues {
 
 struct ItemQueryModifier: ViewModifier {
     @Query private var inventoryItems: [InventoryItem]
-    
+
     init(filter: Predicate<InventoryItem>? = nil) {
-        // Fix: Use proper sort descriptor without closure
+        let defaultPredicate = #Predicate<InventoryItem> { item in
+            true
+        }
+
         _inventoryItems = Query(
-            filter: filter,
-            sort: [SortDescriptor(\InventoryItem.itemName)]
+            filter: filter ?? defaultPredicate,
+            sort: [SortDescriptor(\.itemName)]
         )
     }
-    
+
     func body(content: Content) -> some View {
         content
-            .environment(\.itemCount, inventoryItems.count)
-            // Fix: Proper animation syntax
+            .environment(\.itemCount, inventoryItems.count)  // Fixed: Using keyPath syntax
             .animation(.default, value: inventoryItems.count)
     }
 }

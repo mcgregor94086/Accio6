@@ -1,46 +1,37 @@
-import SwiftData
 import SwiftUI
+import SwiftData
 
 struct InventoryItemDebugView: View {
-    @Environment(\.modelContext) private var modelContext
-    let inventoryItem: InventoryItem
-
-    // Make descriptor mutable by using var instead of let
-    @State private var descriptor: String
-
-    init(inventoryItem: InventoryItem) {
-        self.inventoryItem = inventoryItem
-        // Initialize the State property using _descriptor
-        _descriptor = State(initialValue: "Initial description")
-    }
-
+    let item: InventoryItem
+    
     var body: some View {
-        Form {
+        List {
             Section("Basic Info") {
-                LabeledContent("ID", value: inventoryItem.id)
-                LabeledContent("Name", value: inventoryItem.itemName)
-                LabeledContent("Type", value: inventoryItem.itemType.rawValue)
+                LabeledContent("ID", value: item.id?.uuidString ?? "No ID")
+                LabeledContent("Name", value: item.itemName)
+                LabeledContent("Type", value: item.itemType.rawValue)
+                LabeledContent("Parent ID", value: item.parentID?.uuidString ?? "No Parent")
             }
-
-            Section("Relationships") {
-                if let parentId = inventoryItem.parentID {
-                    LabeledContent("Parent ID", value: parentId)
+            
+            if !item.tags.isEmpty {
+                Section("Tags") {
+                    ForEach(item.tags, id: \.self) { tag in
+                        Text(tag)
+                    }
                 }
-                LabeledContent("Children", value: "\(inventoryItem.children.count)")
-            }
-
-            Section("Debug Info") {
-                TextField("Description", text: $descriptor)
             }
         }
+        .navigationTitle("Debug Info")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: InventoryItem.self, configurations: config)
-    let item = InventoryItem(itemName: "Debug Item")
-
-    return InventoryItemDebugView(inventoryItem: item)
-        .modelContainer(container)
+    NavigationStack {
+        InventoryItemDebugView(item: InventoryItem(
+            itemName: "Test Item",
+            itemType: .item,
+            tags: ["test", "debug"]
+        ))
+    }
 }

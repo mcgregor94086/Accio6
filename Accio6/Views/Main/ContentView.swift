@@ -3,72 +3,65 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<InventoryItem> { $0.parentID == nil },
-           sort: \InventoryItem.itemName) private var rootItems: [InventoryItem]
+    @Query private var items: [InventoryItem]
+    @State private var selectedItem: InventoryItem?
     
-    @State private var showingAddItem = false
-    @State private var searchText = ""
+    init() {
+        let predicate = PredicateBuilder.childrenPredicate(parentID: nil)
+        _items = Query(filter: predicate, sort: \InventoryItem.itemName)
+    }
     
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
-                if rootItems.isEmpty {
-                    ContentUnavailableView(
-                        "No Items",
-                        systemImage: "square.dashed",
-                        description: Text("Add items using the + button")
-                    )
-                } else {
-                    ForEach(rootItems) { item in
-                        NavigationLink {
-                            if item.itemType == .container {
-                                ContainerView(container: item)
-                            } else {
-                                ItemDetailView(item: item)
+                ForEach(items) { item in
+                    HStack {
+                        ItemRow(item: item)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedItem = item
                             }
-                        } label: {
-                            ItemRow(item: item)
-                        }
                     }
-                    .onDelete(perform: deleteItems)
+                    .background(
+                        NavigationLink(value: item, label: { EmptyView() })
+                            .opacity(0)
+                    )
+                }
+                .onDelete(perform: deleteItems)
+            }
+            .listStyle(.plain)
+            .navigationTitle("Inventory")
+            .navigationDestination(for: InventoryItem.self) { item in
+                if item.itemType == .container {
+                    InventoryView(parentID: item.id)
+                        .navigationTitle(item.itemName)
+                        .toolbar {
+                            ToolbarItem(placement: .primaryAction) {
+                                NavigationLink(value: item.id) {
+                                    Label("Add Item", systemImage: "plus")
+                                }
+                            }
+                        }
+                } else {
+                    ItemDetailView(item: item)
                 }
             }
-            .navigationTitle("Inventory")
+            .navigationDestination(for: UUID.self) { id in
+                NewItemEditorView(parentID: id)
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingAddItem = true
-                    } label: {
+                    NavigationLink(value: UUID()) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-        .searchable(text: $searchText)
-        .sheet(isPresented: $showingAddItem) {
-            NavigationStack {
-                NewItemEditorView(parentContainer: nil)
             }
         }
     }
     
     private func deleteItems(at offsets: IndexSet) {
         for index in offsets {
-            let item = rootItems[index]
-            if item.itemType == .container {
-                // Recursively delete children
-                let childItems = item.children
-                for child in childItems {
-                    modelContext.delete(child)
-                }
-            }
-            modelContext.delete(item)
+            modelContext.delete(items[index])
         }
     }
 }
@@ -77,4 +70,3 @@ struct ContentView: View {
     ContentView()
         .modelContainer(for: InventoryItem.self, inMemory: true)
 }
-
